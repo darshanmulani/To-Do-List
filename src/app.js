@@ -9,7 +9,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/ToDo', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://localhost:27017/ToDo');
 const db = mongoose.connection;
 
 // Define User schema
@@ -37,7 +37,6 @@ app.post('/createUser', async (req, res) => {
 
     // Hash the password before saving it to the database
     const hashedPassword = await bcrypt.hash(password, 10);
-
     // Create a new user
     const newUser = new User({
         username,
@@ -45,12 +44,14 @@ app.post('/createUser', async (req, res) => {
     });
 
     // Save the user to the database
-    newUser.save((err) => {
-        if (err) {
-            return res.status(500).json({ error: 'Failed to create user' });
-        }
-        res.status(201).json({ message: 'User created successfully' });
+    newUser.save()
+    .then(savedUser => {
+      console.log('User saved:', savedUser);
+    })
+    .catch(err => {
+      console.error(err);
     });
+
 });
 
 // Login endpoint
