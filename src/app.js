@@ -3,14 +3,20 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+require('dotenv').config();
 
 // Set up Express app
 const app = express();
 app.use(bodyParser.json());
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/ToDo');
-const db = mongoose.connection;
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+        console.log("Connected to MongoDB")
+    })
+    .catch((err) => {
+        console.log(err)
+    });
 
 // Define User schema
 const userSchema = new mongoose.Schema({
@@ -19,7 +25,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Create User model
-const User = mongoose.model('user', userSchema);
+const User = mongoose.model('users', userSchema);
 
 app.get('/', (req, res) => {
   res.send("This is for the TO DO list");
@@ -47,6 +53,7 @@ app.post('/createUser', async (req, res) => {
     newUser.save()
     .then(savedUser => {
       console.log('User saved:', savedUser);
+      res.status("New user Created Successfully", JSON.stringify(savedUser));
     })
     .catch(err => {
       console.error(err);
