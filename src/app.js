@@ -3,10 +3,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const cors = require('cors');
 require('dotenv').config();
 
 // Set up Express app
 const app = express();
+app.use(cors({
+    origin: '*'
+}));
 app.use(bodyParser.json());
 
 // Connect to MongoDB
@@ -53,7 +57,7 @@ app.post('/createUser', async (req, res) => {
     newUser.save()
     .then(savedUser => {
       console.log('User saved:', savedUser);
-      res.status("New user Created Successfully", JSON.stringify(savedUser));
+      res.status(200).json({message: "New user Created Successfully", savedUser});
     })
     .catch(err => {
       console.error(err);
